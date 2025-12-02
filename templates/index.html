@@ -131,10 +131,16 @@
                     document.getElementById("distance").innerText =
                         `Je bent ${distance.toFixed(2)} km van huis 🎁`;
 
-                    // Cycling days (100 km per day)
+                    // Cycling days (100 km/day), with special case for < 100 km
                     const cyclingDays = Math.ceil(distance / 100);
-                    document.getElementById("days-away").innerText =
-                        `Je bent nog ${cyclingDays} dagen fietsen verwijderd`;
+
+                    if (distance < 100) {
+                        document.getElementById("days-away").innerText =
+                            `Je bent minder dan één dag fietsen verwijderd`;
+                    } else {
+                        document.getElementById("days-away").innerText =
+                            `Je bent nog ${cyclingDays} dagen fietsen verwijderd`;
+                    }
                 },
                 err => {
                     document.getElementById("distance").innerText =

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Red pointer arrow -->
+  <polygon points="100,10 130,110 100,90 70,110" fill="#ff4444" stroke="#660000" stroke-width="4"></polygon>
+           
+  <!-- Subtle shadow -->
+  <polygon points="100,10 130,110 100,90 70,110" fill="rgba(0,0,0,0.15)" transform="translate(3, 3)"></polygon>
+
+</svg>

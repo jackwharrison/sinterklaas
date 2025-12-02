@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sinterklaas Compass</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h2>🎁 Sinterklaas Kompas 🎁</h2>
+
+    <div class="compass">
+        <img src="/static/compass_ring.svg" class="ring" alt="Compass Ring">
+        <img id="arrow" src="/static/arrow.svg" class="arrow" alt="Arrow">
+    </div>
+
+    <p id="distance">Locatie ophalen...</p>
+
+    <button onclick="requestOrientationPermission()">Enable Compass</button>
+
+    <script>
+        /* ------------------------------------
+           GLOBALS
+        ------------------------------------ */
+        let currentArrowAngle = 0;
+        let deviceHeading = 0;
+
+        const targetLat = {{ target_lat }};
+        const targetLon = {{ target_lon }};
+
+        /* ------------------------------------
+           RESPONSIVE COMPASS SIZE
+        ------------------------------------ */
+        function resizeCompass() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const size = Math.min(w, h) * 0.68;
+            document.documentElement.style.setProperty('--compass-size', `${size}px`);
+        }
+        window.addEventListener('load', resizeCompass);
+        window.addEventListener('resize', resizeCompass);
+
+        /* ------------------------------------
+           MATH HELPERS
+        ------------------------------------ */
+        function toRad(x) { return x * Math.PI / 180; }
+        function toDeg(x) { return x * 180 / Math.PI; }
+
+        function getBearing(lat1, lon1, lat2, lon2) {
+            const dLon = toRad(lon2 - lon1);
+            lat1 = toRad(lat1);
+            lat2 = toRad(lat2);
+
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1)*Math.sin(lat2) -
+                      Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+
+            return (toDeg(Math.atan2(y, x)) + 360) % 360;
+        }
+
+        function getDistanceKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+
+            const a = Math.sin(dLat/2)**2 +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLon/2)**2;
+
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        /* ------------------------------------
+           ORIENTATION PERMISSIONS
+        ------------------------------------ */
+        function requestOrientationPermission() {
+            if (typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+
+            } else {
+                window.addEventListener('deviceorientationabsolute', handleOrientation);
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        function handleOrientation(event) {
+            let heading;
+
+            if (event.webkitCompassHeading !== undefined) {
+                heading = event.webkitCompassHeading;  // iOS
+            } else if (event.alpha !== null) {
+                heading = 360 - event.alpha;           // Android
+            }
+
+            if (!isNaN(heading)) {
+                deviceHeading = heading;
+            }
+        }
+
+        /* ------------------------------------
+           UPDATE LOOP
+        ------------------------------------ */
+        function updateCompass() {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+
+                    const bearing = getBearing(lat, lon, targetLat, targetLon);
+                    const distance = getDistanceKm(lat, lon, targetLat, targetLon);
+
+                    // Relative bearing
+                    const relativeBearing = (bearing - deviceHeading + 360) % 360;
+
+                    // Smooth rotation
+                    let diff = (relativeBearing - currentArrowAngle + 540) % 360 - 180;
+                    currentArrowAngle += diff * 0.15;
+
+                    document.getElementById("arrow").style.transform =
+                        `rotate(${currentArrowAngle}deg)`;
+
+                    // Distance text
+                    document.getElementById("distance").innerText =
+                        `Je bent ${distance.toFixed(2)} km van huis 🎁`;
+
+                    // Cycling days (100 km per day)
+                    const cyclingDays = Math.ceil(distance / 100);
+                    document.getElementById("days-away").innerText =
+                        `Je bent nog ${cyclingDays} dagen fietsen verwijderd`;
+                },
+                err => {
+                    document.getElementById("distance").innerText =
+                        "Locatietoegang geweigerd.";
+                }
+            );
+        }
+
+        setInterval(updateCompass, 100);
+        updateCompass();
+    </script>
+
+    <!-- CYCLIST ANIMATION -->
+    <div class="cyclist-container">
+        <img src="/static/cyclist.gif" class="cyclist" alt="Cyclist">
+        <p id="days-away">...</p>
+    </div>
+
+</body>
+</html>

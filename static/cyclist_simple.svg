@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260">
+
+  <!-- Wheels -->
+  <circle cx="80" cy="200" r="40" stroke="#000" stroke-width="6" fill="none"></circle>
+  <circle cx="220" cy="200" r="40" stroke="#000" stroke-width="6" fill="none"></circle>
+
+  <!-- Bike frame -->
+  <line x1="80" y1="200" x2="150" y2="150" stroke="#333" stroke-width="6"></line>
+  <line x1="150" y1="150" x2="220" y2="200" stroke="#333" stroke-width="6"></line>
+  <line x1="150" y1="150" x2="150" y2="90" stroke="#333" stroke-width="6"></line>
+
+  <!-- Body -->
+  <line x1="150" y1="90" x2="185" y2="130" stroke="#222" stroke-width="6"></line>
+
+  <!-- Arms -->
+  <line x1="150" y1="90" x2="110" y2="120" stroke="#222" stroke-width="6"></line>
+  <line x1="110" y1="120" x2="160" y2="150" stroke="#222" stroke-width="6"></line>
+
+  <!-- Legs -->
+  <line x1="185" y1="130" x2="220" y2="200" stroke="#222" stroke-width="6"></line>
+  <line x1="185" y1="130" x2="150" y2="200" stroke="#222" stroke-width="6"></line>
+
+  <!-- Head -->
+  <circle cx="150" cy="60" r="28" fill="#f3c7a1" stroke="#222" stroke-width="3"></circle>
+
+  <!-- Hair -->
+  <path d="M125 55
+           C130 30, 170 30, 175 55
+           C170 85, 130 85, 125 55" fill="#7a4a22"></path>
+
+  <!-- Ponytail -->
+  <ellipse cx="175" cy="75" rx="12" ry="18" fill="#7a4a22"></ellipse>
+</svg>
